@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -8,6 +9,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+
+import Link from "next/link";
+
 type Budget = {
   shortId: number;
   license: number;
@@ -15,6 +19,8 @@ type Budget = {
   customer: {
     name: string;
   };
+  salesman: string;
+  billedAt: Date;
 }
 
 export default async function Budget() {
@@ -31,7 +37,10 @@ export default async function Budget() {
               <TableHead>Orçamento</TableHead>
               <TableHead>Licença</TableHead>
               <TableHead>Cliente</TableHead>
+              <TableHead>Vendedor (a)</TableHead>
+              <TableHead>Faturado</TableHead>
               <TableHead className="text-right">Vlr. Liq</TableHead>
+              <TableHead>Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -40,9 +49,17 @@ export default async function Budget() {
                 <TableCell>{budget.shortId}</TableCell>
                 <TableCell>{budget.license}</TableCell>
                 <TableCell>{budget.customer.name}</TableCell>
-                <TableCell className="text-right">{Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(budget.netAmount)}</TableCell>    
-              </TableRow>))
-              }
+                <TableCell>{budget.salesman}</TableCell>
+                <TableCell>{new Date(budget.billedAt).toLocaleDateString()}</TableCell>
+                <TableCell className="text-right">{Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(budget.netAmount)}</TableCell>
+                <TableCell>
+                  <Link href={`/budgets/${budget.shortId}`}>
+                    <Button variant="secondary">Detalhes</Button>
+                  </Link>
+                </TableCell>
+              </TableRow>
+            ))
+            }
           </TableBody>
         </Table>
 
