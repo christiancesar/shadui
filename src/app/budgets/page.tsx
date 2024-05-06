@@ -21,6 +21,7 @@ type Budget = {
   };
   salesman: string;
   billedAt: Date;
+  status_producer: string;
 }
 
 export default async function Budget() {
@@ -40,6 +41,7 @@ export default async function Budget() {
               <TableHead>Vendedor (a)</TableHead>
               <TableHead>Faturado</TableHead>
               <TableHead className="text-right">Vlr. Liq</TableHead>
+              <TableHead>Status de Produção</TableHead>
               <TableHead>Ações</TableHead>
             </TableRow>
           </TableHeader>
@@ -52,6 +54,7 @@ export default async function Budget() {
                 <TableCell>{budget.salesman}</TableCell>
                 <TableCell>{new Date(budget.billedAt).toLocaleDateString()}</TableCell>
                 <TableCell className="text-right">{Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(budget.netAmount)}</TableCell>
+                <TableCell>{budget.status_producer}</TableCell>
                 <TableCell>
                   <Link href={`/budgets/${budget.shortId}`}>
                     <Button variant="secondary">Detalhes</Button>

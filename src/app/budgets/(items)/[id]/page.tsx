@@ -29,13 +29,8 @@ import {
 } from "@/components/ui/drawer";
 
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
+import Select from 'react-select';
 
 interface BudgetItemsProps {
   params: {
@@ -125,10 +120,10 @@ type Budget = {
 }
 
 export default async function BudgetItems({ params }: BudgetItemsProps) {
-  const response = (await fetch('http://localhost:3333/budgets'));
+  const response = (await fetch('http://localhost:3333/budgets', { cache: "no-store" }));
   const budgets = await response.json() as Budget[];
   const budget = budgets.find((budget) => budget.shortId === Number(params.id));
-  const looseItemsCount = budget?.looseItems.reduce((acc, item) => acc + item.quantity, 0);  
+  const looseItemsCount = budget?.looseItems.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
     <>
@@ -148,7 +143,7 @@ export default async function BudgetItems({ params }: BudgetItemsProps) {
               <CardTitle className="text-sm font-medium">Quantidade de itens</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold ">{(budget!.itemsCount + looseItemsCount!).toFixed(2).replace(".", ",")}</div>
+              <div className="text-2xl font-bold ">{(budget?.itemsCount + looseItemsCount!).toFixed(2).replace(".", ",")}</div>
             </CardContent>
           </Card>
 
@@ -157,7 +152,7 @@ export default async function BudgetItems({ params }: BudgetItemsProps) {
               <CardTitle className="text-sm font-medium">Valor total</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(budget!.grossAmount)}</div>
+              <div className="text-2xl font-bold">{Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(budget?.grossAmount)}</div>
             </CardContent>
           </Card>
 
@@ -166,7 +161,7 @@ export default async function BudgetItems({ params }: BudgetItemsProps) {
               <CardTitle className="text-sm font-medium">Valor de desconto</CardTitle>
             </CardHeader>
             <CardContent className="flex">
-              <div className="text-2xl font-bold">{Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(budget!.discountAmount)}</div>
+              <div className="text-2xl font-bold">{Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(budget?.discountAmount)}</div>
               <p className="text-xs text-muted-foreground text-right self-center ml-2 clo">{`(${budget?.percentAmount.toLocaleString("pt-BR")}%)`}</p>
             </CardContent>
           </Card>
@@ -176,7 +171,7 @@ export default async function BudgetItems({ params }: BudgetItemsProps) {
               <CardTitle className="text-sm font-medium">Valor liquido</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(budget!.netAmount)}</div>
+              <div className="text-2xl font-bold">{Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(budget?.netAmount)}</div>
             </CardContent>
           </Card>
         </div>
@@ -253,47 +248,27 @@ export default async function BudgetItems({ params }: BudgetItemsProps) {
                                 </TableBody>
                               </Table>
                             </div>
-                            <div className="flex w-full mt-2 mb-2 space-x-2">   
-                            <Select>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Serviço" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {serviceTypes.map((service) => (
-                                    <SelectItem 
-                                      value={service.name} 
-                                      key={service.name}
-                                    >
-                                      {service.name}
-                                    </SelectItem>
-                                  ))}                                  
-                                </SelectContent>
-                              </Select>       
-                            <Select>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Colaborador" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {employees.filter((employee) => employee.department.name === "Esquadria").map((employeeFilter) => (
-                                    <SelectItem 
-                                      value={employeeFilter.name} 
-                                      key={employeeFilter.name}
-                                    >
-                                      {employeeFilter.name}
-                                    </SelectItem>
-                                  ))}                                  
-                                </SelectContent>
-                              </Select>                                                   
-                              <Input 
-                                type="text" 
-                                placeholder="Vlr. Liquido" 
-                                readOnly={true} 
+                            <div className="flex w-full mt-2 mb-2 space-x-2">
+                              {/* <Select 
+                                closeMenuOnSelect={false}
+                                isMulti
+                                options={serviceTypes.map((serviceType) => ({ value: serviceType.name, label: serviceType.name }))}
+                              />     
+                              <Select 
+                                closeMenuOnSelect={false}
+                                isMulti
+                                options={employees.map((employee) => ({ value: employee.name, label: employee.name }))}
+                              />                               */}
+                              <Input
+                                type="text"
+                                placeholder="Vlr. Liquido"
+                                readOnly={true}
                                 value={Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(items.total_amount - items.total_amount * (budget.percentAmount / 100))}
-                              />                             
-                              <Input type="number" placeholder="Porcentagem"/>
-                              <Input type="number" placeholder="Divido por"/>
-                             
-                              <Input type="text" readOnly={true} value={Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(((items.total_amount - (items.total_amount * (budget.percentAmount / 100)))*(1.5/100)))}/>
+                              />
+                              <Input type="number" placeholder="Porcentagem" />
+                              <Input type="number" placeholder="Divido por" />
+
+                              <Input type="text" readOnly={true} value={Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(((items.total_amount - (items.total_amount * (budget.percentAmount / 100))) * (1.5 / 100)))} />
                               <Button>
                                 Adicionar comissão
                               </Button>
